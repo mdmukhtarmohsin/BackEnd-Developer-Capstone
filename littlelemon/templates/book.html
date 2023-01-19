@@ -1,0 +1,50 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<section>
+  <article>
+    <h1>Make a reservation</h1>
+    <!--Begin row-->
+    <div class="row">
+      <!--Begin col-->
+      <div class="column">
+        {% csrf_token %}
+        <form method="POST" id="form">
+          <!-- {% csrf_token %} -->
+          <p>
+            <label for="first_name">Name:</label>
+            <input
+              type="text"
+              placeholder="Your Name"
+              maxlength="200"
+              required=""
+              id="first_name"
+            />
+          </p>
+          <p>
+            <label for="id_bookingdate">Booking Date:</label>
+
+            <input type="datetime-local" id="id_bookingdate">
+          </p>
+
+          <p>
+            <label for="no_of_guests">Number of Guests:</label>
+            <input type="number" id="no_of_guests" min="1" max="5">
+          </p>
+          <button type="button" id="button">Reserve</button>
+        </form>
+      </div>
+      <!--End col-->
+
+      <!--Begin col-->
+      <div class="column">
+        <h2>Bookings For <span id="today"></span></h2>
+        <div id="bookings"></div>
+      </div>
+      <!--End col-->
+    </div>
+    <!--End row-->
+  </article>
+</section>
+<script>
+  console.log(document.getElementById("id_bookingdate").value)
+;</script>
+{% endblock %}
