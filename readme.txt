@@ -15,11 +15,11 @@ first link to open
 
 http://127.0.0.1:8000/restaurant/ 
 
-POST here to with username and password to create account:
+POST here with username and password to create account:
 
 http://127.0.0.1:8000/auth/users/
 
-POST here to with username and password to get token:
+POST here with username and password to get token:
 
 http://127.0.0.1:8000/auth/token/login/
 
