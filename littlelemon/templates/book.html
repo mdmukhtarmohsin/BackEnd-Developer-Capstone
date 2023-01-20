@@ -7,7 +7,7 @@
       <!--Begin col-->
       <div class="column">
         {% csrf_token %}
-        <form method="POST" id="form">
+        <form method="POST" id="form" {% csrf_token %}>
           <!-- {% csrf_token %} -->
           <p>
             <label for="first_name">Name:</label>
@@ -35,16 +35,28 @@
       <!--End col-->
 
       <!--Begin col-->
-      <div class="column">
-        <h2>Bookings For <span id="today"></span></h2>
-        <div id="bookings"></div>
-      </div>
       <!--End col-->
     </div>
     <!--End row-->
   </article>
 </section>
 <script>
-  console.log(document.getElementById("id_bookingdate").value)
-;</script>
+  document.getElementById("button").addEventListener("click", function (e) {
+    const formdata = {
+      name: document.getElementById("first_name").value,
+      no_of_guests: parseInt(document.getElementById("no_of_guests").value),
+      bookingdate: document.getElementById("id_bookingdate").value,
+    };
+
+    fetch("{% url 'booking' %}", {
+      method: "post",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formdata),
+    })
+    console.log(JSON.stringify(formdata))
+    window.location.href = "http://127.0.0.1:8000/restaurant/reservations/";
+  });
+</script>
 {% endblock %}

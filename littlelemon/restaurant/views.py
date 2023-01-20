@@ -1,14 +1,17 @@
 from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from .models import Booking, Menu
-from . import serializer
+from . import serializers
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from django.http import HttpResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
-from django.core import serializers
 from datetime import datetime
+from django.utils.decorators import method_decorator
+from rest_framework.response import Response
+from django.http import JsonResponse
+from django.core import serializers as ser
 
 # Create your views here.
 
@@ -40,43 +43,34 @@ def book(request):
 
 
 def reservations(request):
-    return render(request, 'bookings.html', {})
+    bookings = Booking.objects.all()
+    booking_json = ser.serialize('json', bookings)
+    return render(request, 'bookings.html', {"bookings": booking_json})
 
 
 class MenuView(ListCreateAPIView):
     queryset = Menu.objects.all()
-    serializer_class = serializer.MenuSerializer
+    serializer_class = serializers.MenuSerializer
 
 
 class SingleMenuView(RetrieveUpdateDestroyAPIView):
     queryset = Menu.objects.all()
-    serializer_class = serializer.MenuSerializer
+    serializer_class = serializers.MenuSerializer
 
 
-class BookingView(viewsets.ModelViewSet):
-    queryset = Booking.objects.all()
-    serializer_class = serializer.BookingSerializer
+class BookingView(ListCreateAPIView):
+    @csrf_exempt
+    def get(self, request):
+        query = Booking.objects.all()
+        serializer = serializers.BookingSerializer(query, many=True)
+        return Response(serializer.data)
 
-
-@csrf_exempt
-def bookings(request):
-    if request.method == 'POST':
-        data = json.load(request)
-        exist = Booking.objects.filter(reservation_date=data['reservation_date']).filter(
-            reservation_slot=data['reservation_slot']).exists()
-        if exist == False:
-            booking = Booking(
-                first_name=data['first_name'],
-                reservation_date=data['reservation_date'],
-                reservation_slot=data['reservation_slot'],
-            )
-            booking.save()
-        else:
-            return HttpResponse("{'error':1}", content_type='application/json')
-
-    date = request.GET.get('date', datetime.today().date())
-
-    bookings = Booking.objects.all().filter(reservation_date=date)
-    booking_json = serializers.serialize('json', bookings)
-
-    return HttpResponse(booking_json, content_type='application/json')
+    @csrf_exempt
+    def post(self, request):
+        query = Booking()
+        query.name = request.data['name']
+        query.no_of_guests = request.data['no_of_guests']
+        query.bookingdate = request.data['bookingdate']
+        query.save()
+        serializer = serializers.BookingSerializer(query)
+        return Response(serializer.data)
